@@ -1,0 +1,43 @@
+node{
+    
+    stage ('Cloning the NodeGOAT project from Git'){
+        git 'https://github.com/Rorschach-10/DVWA.git'
+    }
+    
+    stage ('OWASP Dependency Checking') {
+        dependencyCheck additionalArguments: 
+        '''--project OWASP dependency check
+        ''', odcInstallation: 'Dependency-check'
+        dependencyCheckPublisher failedTotalCritical: 1, pattern: ''
+    }
+    
+    stage ('Comfirmation on SCA') {
+        input 'Please review the SCA result before proceed to the next stage.'
+    }
+
+    stage ('SonarQube Analysis') {
+        withSonarQubeEnv('SonarQube-Server'){
+            sh '''
+            export PATH=$PATH:/home/rorschach/sonar-scanner/bin
+            cd /var/lib/jenkins
+            pwd
+            echo $PATH
+            sonar-scanner \
+            -D sonar.login=a0c0a390bcfad58007ba78d8478919578e9d2fc8 \
+            -D sonar.projectKey=dvwa \
+            -D sonar.projectName=DVWA-Scan-pipeline \
+            -D sonar.projectVersion=1.0  
+            ''' 
+        }
+            
+    }
+    
+    stage ('Comfirmation on SAST') {
+        input 'Please review the SAST result before proceed to the next stage.'
+    }
+    
+    stage ('Acunetix Analysis') {
+        
+    }
+        
+}
