@@ -35,9 +35,5 @@ node{
     stage ('Comfirmation on SAST') {
         input 'Please review the SAST result before proceed to the next stage.'
     }
-    
-    stage ('Acunetix Analysis') {
-        
-    }
-        
+
 }
